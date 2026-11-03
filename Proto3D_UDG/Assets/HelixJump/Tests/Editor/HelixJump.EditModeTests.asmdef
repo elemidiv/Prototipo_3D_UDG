@@ -1,0 +1,6 @@
+{
+  "name": "HelixJump.EditModeTests",
+  "references": ["Unity.ugui"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}
