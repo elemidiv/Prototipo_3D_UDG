@@ -9,7 +9,7 @@ public class HelixJumpTests
         .FirstOrDefault(t => t.FullName == name);
 
     [Test]
-    public void ChristmasScene_HasTutorialPhysics_Prefabs_AndOnlyTitleUI()
+    public void ChristmasScene_HasTutorialPhysics_Prefabs_AndTitleUI()
     {
         const string path = "Assets/HelixJump/Scenes/HelixJump.unity";
         Assert.That(UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEditor.SceneAsset>(path), Is.Not.Null, "Falta la escena Helix Jump.");
@@ -26,8 +26,7 @@ public class HelixJumpTests
         Assert.That(colliders.All(c => c.sharedMesh != null), Is.True, "Cada pieza requiere malla de colisión.");
         Assert.That(roots.SelectMany(r => r.GetComponentsInChildren<Canvas>()).Count(), Is.EqualTo(1));
         var labels = roots.SelectMany(r => r.GetComponentsInChildren<UnityEngine.UI.Text>()).ToArray();
-        Assert.That(labels.Length, Is.EqualTo(1));
-        Assert.That(labels[0].text, Is.EqualTo("Helix Jump"));
+        Assert.That(labels.Single(t => t.name == "GameTitle").text, Is.EqualTo("Helix Jump"));
         Assert.That(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/HelixJump/Prefabs/HelixLevel.prefab"), Is.Not.Null);
         Assert.That(UnityEditor.PlayerSettings.defaultInterfaceOrientation, Is.EqualTo(UnityEditor.UIOrientation.Portrait));
     }
@@ -60,6 +59,8 @@ public class HelixJumpTests
         var type = Find("HelixJump.BallController");
         Assert.That(type, Is.Not.Null, "Falta el controlador de rebote del tutorial.");
         var ball = new GameObject("TestBall");
+        // Aislar el ensayo de impulso de los colliders de la escena abierta.
+        ball.transform.position = new Vector3(1000, 1000, 1000);
         var oldMode = Physics.simulationMode;
         Physics.simulationMode = SimulationMode.Script;
         try

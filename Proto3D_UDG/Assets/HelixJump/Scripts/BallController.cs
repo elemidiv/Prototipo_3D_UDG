@@ -41,6 +41,8 @@ namespace HelixJump
             body.AddForce(Vector3.up * impulseForce, ForceMode.Impulse);
             nextBounceTime = time + collisionCooldown;
             BounceCount++;
+            // Capítulo 4: un punto por rebote, después del filtro antidoblecontacto.
+            if (GameManager.Instance != null) GameManager.Instance.AddScore(1);
             return true;
         }
     }
