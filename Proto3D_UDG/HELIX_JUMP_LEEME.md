@@ -1,6 +1,6 @@
-# Helix Jump — Actividades 4.1 y 4.2
+# Helix Jump — Actividades 4.1, 4.2 y 4.3
 
-Implementación de los capítulos 1 a 4 de LuisCanary, adaptada a Unity **6000.6.7f1**, URP e Input System.
+Implementación de los capítulos 1 a 6 de LuisCanary, adaptada a Unity **6000.6.7f1**, URP e Input System.
 
 ## Abrir y probar
 
@@ -12,7 +12,7 @@ Implementación de los capítulos 1 a 4 de LuisCanary, adaptada a Unity **6000.6
 6. Al tocar la meta se escribe **Pasamos de nivel** en Console. No cambia de escena: ese desarrollo pertenece a capítulos posteriores.
 7. Detén Play y vuelve a iniciarlo: Score se reinicia y Best se conserva. El récord local puede incluir puntuaciones obtenidas durante las pruebas de desarrollo.
 
-**Regla de los capítulos 3 y 4:** se suma un punto por cada rebote aceptado, incluso sobre la misma plataforma. El bloqueo de contactos duplicados impide dos puntos por un mismo rebote. La puntuación por superar plataformas, obstáculos letales, dificultad progresiva, victoria/derrota, generación de niveles, cambio real de escena y menús NO se implementan todavía.
+**Regla actual del capítulo 5:** +1 al atravesar cada plataforma mediante un trigger, una vez por intento. Rebotar ya no suma puntos. Tocar una pieza roja reinicia Score y posición/velocidad de la bola, rearma triggers y meta, y conserva Best. Marfil identifica superficies seguras; rojo, peligros. No se añaden vidas, menús ni pantallas de derrota.
 
 ## Implementado
 
@@ -24,7 +24,7 @@ Implementación de los capítulos 1 a 4 de LuisCanary, adaptada a Unity **6000.6
 - Seguimiento de cámara en Y con separación inicial constante, manteniendo X/Z. Actualización en LateUpdate.
 - Material físico sin rebote adicional para no acumular impulsos; materiales gráficos compatibles con URP.
 - Canvas adaptable a resolución con **Helix Jump**, **Score** y **Best**. Texto marfil con contorno oscuro para mantener contraste durante el descenso.
-- Paleta navideña: bola verde esmeralda, plataformas rojo arándano/blanco cálido, torre verde pino, meta dorada y fondo menta. El título y los contadores usan marfil con contorno verde oscuro.
+- Paleta navideña: bola verde esmeralda, plataformas marfil con sectores peligrosos rojos, torre verde pino, meta dorada y fondo menta. El título y los contadores usan marfil con contorno verde oscuro.
 - Orientación vertical y escena incluida en la lista de compilación. La plataforma Android ya estaba activa y sus módulos estaban disponibles.
 
 ## Archivos
@@ -44,7 +44,9 @@ Implementación de los capítulos 1 a 4 de LuisCanary, adaptada a Unity **6000.6
 
 Los assets originales importados y SampleScene se conservaron. No se ejecutaron comandos Git ni operaciones GitHub.
 
-## Validación realizada
+## Validación histórica de capítulos 1 a 4
+
+Estos resultados corresponden a versiones anteriores; la regla de puntuación por rebote fue sustituida por el capítulo 5. La validación actual se detalla al final.
 
 - Nueve pruebas EditMode aprobadas: giro Y y reinicio del arrastre, suma única por rebote, récord persistente entre sesiones, actualización Score/Best, meta filtrada y aviso único, conexión de escena y tres pruebas de regresión de capítulos 1/2.
 - Play Mode: rebotes repetidos sobre la unión de dos sectores.
@@ -62,3 +64,40 @@ No se generó APK ni se probó en un dispositivo Android físico. No se afirma v
 2. Crea tu primer Videojuego para Android con Unity/HelixJump/Fisicas Bola/2-Cap: https://youtu.be/VHLz-UHErnA
 3. Movimiento Helix y Score/3-Cap: https://youtu.be/-iNJYemon3Y
 4. Score y HighScore/4-Cap: https://youtu.be/NSQ8D0i2_Sw
+5. Score y DeathPart/5-Cap: https://youtu.be/0asOPNehwHY
+6. Lógica Levels/6-Cap: https://youtu.be/tx5PDevroCE
+
+## Actividad 4.3 — capítulos 5 y 6
+
+Se consultaron las transcripciones completas de ambos apoyos. Alcance limitado a los tutoriales por decisión expresa del estudiante: no adelantar mecánicas de capítulos posteriores.
+
+### Componentes nuevos
+- `PassScorePoint.cs`: BoxCollider trigger; filtra la bola, suma +1 una vez y se rearma al reiniciar. Retirada la puntuación por rebote de BallController.
+- `DeathPart.cs`: peligro rojo al activarse; MaterialPropertyBlock evita cambiar materiales compartidos de otras piezas.
+- `BallController.ResetBall()`: vuelve a la posición inicial y limpia la velocidad física. La detección de peligro tiene prioridad sobre el rebote.
+- `GameManager.RestartLevel()`: Score a cero, restablecimiento de bola, rearme de triggers/meta y actualización UI. Conserva la clave `HelixJump.HighScore`.
+- `Prefabs/HelixLevel_Chapter56.prefab`: prefab propio con puntuación por paso y peligro; preserva los recursos originales importados.
+- `Editor/Chapter56Setup.cs`: configuración ya aplicada de las dos plataformas y sus peligros. No es necesario ejecutarla para jugar; puede reemplazar ajustes manuales de dichas plataformas.
+
+### Stage: datos editables, no generador
+Crea assets desde **Assets > Create > Helix Jump > Stage**. En `Stages/Stage_Example.asset` hay 12 secciones con `partCount=11` y `deathCount=0`.
+
+`Stage` contiene colores `backgroundColor`, `helixColor`, `ballColor` (blancos por defecto) y una lista de `Level` serializable. Cada sección expone `partCount` (1–11, inicial 11) y `deathCount` (0–11, inicial 1). Son cantidades de sectores por anillo, no un límite de 11 anillos por stage.
+
+`HelixController` conserva el arrastre y añade referencias a plataforma superior, meta, prefab, stages y plataformas. Calcula la distancia vertical disponible (6.1 en esta escena). **LoadStage(int) permanece vacío y su llamada inicial comentada**, tal como termina el capítulo 6. Los datos de Stage aún no generan piezas ni cambian colores del escenario.
+
+No se implementan generación infinita/continua, dificultad progresiva, transiciones reales ni aplicación automática de colores de Stage. Esta preparación no se presenta como generación terminada.
+
+### Cómo verificar lo nuevo
+1. Pulsa Play y rebota en marfil: Score no aumenta.
+2. Gira la torre para atravesar un hueco: Score aumenta en uno.
+3. Toca un sector rojo: bola al inicio y Score a cero. Best se conserva; puedes puntuar nuevamente al atravesar las plataformas.
+4. Selecciona Stage_Example en Project para editar sus secciones y colores; no altera todavía la escena.
+
+### Validación actual
+Suite Unity Pipeline, filtro HelixJump, modo EditMode: **12/12 aprobadas**. Incluye una UnityTest que entra realmente a Play Mode y verifica OnTriggerEnter y colisión DeathPart con física: suma por paso, rearme, reinicio de posición/velocidad, Score, conservación de Best y restablecimiento de meta. El ensayo usa objetos aislados lejos de la torre e inmoviliza temporalmente la bola original; nada de eso queda guardado en la escena.
+
+Se verificaron además el asset Stage de 12 secciones, referencias del Inspector, dos triggers y dos peligros activos, prefab propio y regresiones de controles, cámara, UI y persistencia. Las pruebas deben restaurar solamente la clave concreta de PlayerPrefs, sin DeleteAll. Captura real de Game View en 1080 × 1920 revisada visualmente. Escena guardada, Play detenido y override Run In Background desactivado al terminar.
+
+No se generó APK ni se validó Android físico. Git/GitHub y la entrega están bajo control del usuario. El ZIP es respaldo de fuentes reproducible; el producto solicitado por UDG+ sigue siendo un enlace público al repositorio.
+

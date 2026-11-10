@@ -61,6 +61,7 @@ public class HelixJumpTests
         var ball = new GameObject("TestBall");
         // Aislar el ensayo de impulso de los colliders de la escena abierta.
         ball.transform.position = new Vector3(1000, 1000, 1000);
+        var physics = UnityEngine.Physics.defaultPhysicsScene;
         var oldMode = Physics.simulationMode;
         Physics.simulationMode = SimulationMode.Script;
         try
@@ -72,13 +73,13 @@ public class HelixJumpTests
             var bounce = type.GetMethod("TryBounceAt");
             Assert.That(bounce, Is.Not.Null);
             Assert.That((bool)bounce.Invoke(controller, new object[] { 1f }), Is.True);
-            Physics.Simulate(0.02f);
+            physics.Simulate(0.02f);
             float firstVelocity = rb.linearVelocity.y;
             Assert.That(firstVelocity, Is.GreaterThan(0));
             Assert.That((bool)bounce.Invoke(controller, new object[] { 1.01f }), Is.False);
             Assert.That(rb.linearVelocity.y, Is.EqualTo(firstVelocity).Within(0.001f));
             Assert.That((bool)bounce.Invoke(controller, new object[] { 1.21f }), Is.True);
-            Physics.Simulate(0.02f);
+            physics.Simulate(0.02f);
             Assert.That(rb.linearVelocity.y, Is.EqualTo(firstVelocity).Within(0.001f), "El rebote no debe acumular energía.");
         }
         finally { UnityEngine.Object.DestroyImmediate(ball); Physics.simulationMode = oldMode; }

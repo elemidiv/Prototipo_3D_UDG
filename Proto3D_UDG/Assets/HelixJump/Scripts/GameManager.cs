@@ -44,7 +44,11 @@ namespace HelixJump
 
         public void RestartLevel()
         {
-            // Preparado como en el capítulo 3; todavía no hay muerte ni reinicio.
+            CurrentScore = 0;
+            GoalReached = false;
+            foreach (var point in FindObjectsByType<PassScorePoint>(FindObjectsInactive.Include, FindObjectsSortMode.None)) point.Rearm();
+            foreach (var ball in FindObjectsByType<BallController>(FindObjectsSortMode.None)) ball.ResetBall();
+            foreach (var ui in FindObjectsByType<UIManager>(FindObjectsSortMode.None)) ui.RefreshNow();
         }
 
         void OnDestroy()

@@ -9,12 +9,16 @@ namespace HelixJump
         [SerializeField, Min(0.1f)] float impulseForce = 3f;
         [SerializeField, Min(0f)] float collisionCooldown = 0.2f;
         Rigidbody body;
+        Vector3 initialPosition;
+        bool initialized;
         float nextBounceTime = float.NegativeInfinity;
         public int BounceCount { get; private set; }
         public float ImpulseForce => impulseForce;
 
         void Awake()
         {
+            initialPosition = transform.position;
+            initialized = true;
             body = GetComponent<Rigidbody>();
             body.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ |
                                RigidbodyConstraints.FreezeRotation;
@@ -24,6 +28,12 @@ namespace HelixJump
 
         void OnCollisionEnter(Collision collision)
         {
+            if (collision.collider.GetComponentInParent<DeathPart>() != null)
+            {
+                if (GameManager.Instance != null) GameManager.Instance.RestartLevel();
+                else ResetBall();
+                return;
+            }
             // Solo las superficies bajo la bola producen un rebote; no las paredes laterales.
             foreach (var contact in collision.contacts)
                 if (contact.normal.y > 0.5f)
@@ -31,6 +41,18 @@ namespace HelixJump
                     TryBounceAt(Time.time);
                     break;
                 }
+        }
+
+        public void ResetBall()
+        {
+            if (!initialized) { initialPosition = transform.position; initialized = true; }
+            if (body == null) body = GetComponent<Rigidbody>();
+            body.linearVelocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
+            body.position = initialPosition;
+            transform.position = initialPosition;
+            nextBounceTime = float.NegativeInfinity;
+            BounceCount = 0;
         }
 
         public bool TryBounceAt(float time)
@@ -41,8 +63,6 @@ namespace HelixJump
             body.AddForce(Vector3.up * impulseForce, ForceMode.Impulse);
             nextBounceTime = time + collisionCooldown;
             BounceCount++;
-            // Capítulo 4: un punto por rebote, después del filtro antidoblecontacto.
-            if (GameManager.Instance != null) GameManager.Instance.AddScore(1);
             return true;
         }
     }

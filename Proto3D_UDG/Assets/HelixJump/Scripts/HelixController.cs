@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,6 +9,24 @@ namespace HelixJump
     public sealed class HelixController : MonoBehaviour
     {
         [SerializeField, Min(0.01f)] float degreesPerPixel = 0.35f;
+        [SerializeField] Transform top;
+        [SerializeField] Transform goal;
+        [SerializeField] GameObject levelPrefab;
+        [SerializeField] List<Stage> stages = new List<Stage>();
+        [SerializeField] List<GameObject> spawnedLevels = new List<GameObject>();
+        public float StageDistance { get; private set; }
+
+        void Start()
+        {
+            if (top != null && goal != null) StageDistance = top.localPosition.y - goal.localPosition.y + 0.1f;
+            // LoadStage(0); // La generación se implementa en un capítulo posterior.
+        }
+
+        public void ConfigureStage(Transform topReference, Transform goalReference, GameObject prefab, List<Stage> stageList, List<GameObject> spawned)
+        { top = topReference; goal = goalReference; levelPrefab = prefab; stages = stageList; spawnedLevels = spawned; }
+
+        public void LoadStage(int index) { }
+
         bool dragging;
         Vector2 lastPosition;
 

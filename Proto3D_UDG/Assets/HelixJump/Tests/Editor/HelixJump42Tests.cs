@@ -96,7 +96,7 @@ public class HelixJump42Tests
     }
 
     [Test]
-    public void Bounce_ScoresOncePerAcceptedBounce_IncludingSamePlatform()
+    public void Bounce_DoesNotScore_InChapterFive()
     {
         var managerType = Find("GameManager");
         var ballType = Find("BallController");
@@ -113,11 +113,11 @@ public class HelixJump42Tests
             var ball = ballGo.AddComponent(ballType);
             var bounce = ballType.GetMethod("TryBounceAt");
             bounce.Invoke(ball, new object[] { 1f });
-            Assert.That((int)managerType.GetProperty("CurrentScore").GetValue(manager), Is.EqualTo(1));
+            Assert.That((int)managerType.GetProperty("CurrentScore").GetValue(manager), Is.Zero);
             bounce.Invoke(ball, new object[] { 1.01f });
-            Assert.That((int)managerType.GetProperty("CurrentScore").GetValue(manager), Is.EqualTo(1));
+            Assert.That((int)managerType.GetProperty("CurrentScore").GetValue(manager), Is.Zero);
             bounce.Invoke(ball, new object[] { 1.21f });
-            Assert.That((int)managerType.GetProperty("CurrentScore").GetValue(manager), Is.EqualTo(2));
+            Assert.That((int)managerType.GetProperty("CurrentScore").GetValue(manager), Is.Zero);
         }
         finally
         {
