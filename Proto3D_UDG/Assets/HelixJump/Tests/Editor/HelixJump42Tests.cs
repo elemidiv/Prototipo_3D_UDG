@@ -51,7 +51,7 @@ public class HelixJump42Tests
             UnityEngine.TestTools.LogAssert.Expect(LogType.Log, "Pasamos de nivel");
             Assert.That((bool)reach.Invoke(goal, new object[] { ballGo.GetComponent<Collider>() }), Is.True);
             Assert.That((bool)reach.Invoke(goal, new object[] { ballGo.GetComponent<Collider>() }), Is.False);
-            Assert.That((int)managerType.GetProperty("CurrentLevel").GetValue(manager), Is.EqualTo(0));
+            Assert.That((int)managerType.GetProperty("CurrentLevel").GetValue(manager), Is.EqualTo(1));
         }
         finally
         {

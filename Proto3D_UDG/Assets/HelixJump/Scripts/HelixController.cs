@@ -15,6 +15,7 @@ namespace HelixJump
         [SerializeField] List<Stage> stages = new List<Stage>();
         [SerializeField] List<GameObject> spawnedLevels = new List<GameObject>();
         public float StageDistance { get; private set; }
+        public int StageCount => stages == null ? 0 : stages.Count;
 
         Quaternion initialRotation;
         bool rotationCaptured;

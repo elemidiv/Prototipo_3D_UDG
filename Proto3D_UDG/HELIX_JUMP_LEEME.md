@@ -1,15 +1,15 @@
-# Helix Jump — Actividades 4.1 a 4.4
+# Helix Jump — Actividades 4.1 a 4.5
 
-Implementación de los capítulos 1 a 8 de LuisCanary, adaptada a Unity **6000.6.7f1**, URP e Input System.
+Implementación de los capítulos 1 a 10 de LuisCanary, adaptada a Unity **6000.6.7f1**, URP e Input System.
 
 ## Abrir y probar
 
-1. Abre `Assets/HelixJump/Scenes/HelixJump.unity`.
+1. Abre `Assets/HelixJump/Scenes/MainMenu.unity` para comenzar desde el menú (la escena de juego sigue siendo `HelixJump.unity`).
 2. En Game selecciona la resolución **Helix Jump Portrait (1080 × 1920)**, o cualquier proporción vertical 9:16.
-3. Pulsa Play. La bola verde cae y rebota; Score empieza en cero y Best carga el récord local.
+3. Pulsa Play y después **Jugar** en el menú. La bola verde cae y rebota; Score empieza en cero y Best carga el récord local.
 4. Mantén pulsado el botón izquierdo del ratón sobre Game y arrastra horizontalmente para girar la torre. En móvil, el controlador lee el toque principal mediante Input System; pendiente de validación en dispositivo físico.
 5. Alinea los huecos de la plataforma superior y las tres plataformas generadas con la bola para descender hasta la meta dorada. Los huecos y peligros de las plataformas generadas cambian al volver a iniciar Play.
-6. Al tocar la meta se escribe **Pasamos de nivel** en Console. No cambia de escena: ese desarrollo pertenece a capítulos posteriores.
+6. Al tocar la meta avanzas al siguiente Stage, conservando Score y regresando la bola al inicio. Al agotar los tres Stages se recarga el último sin índices fuera de rango. Los Stages comparten la misma escena; SceneManager se utiliza del menú al juego.
 7. Detén Play y vuelve a iniciarlo: Score se reinicia y Best se conserva. El récord local puede incluir puntuaciones obtenidas durante las pruebas de desarrollo.
 
 **Regla actual del capítulo 5:** +1 al atravesar cada plataforma mediante un trigger, una vez por intento. Rebotar ya no suma puntos. Tocar una pieza roja reinicia Score y posición/velocidad de la bola, rearma triggers y meta, y conserva Best. Marfil identifica superficies seguras; rojo, peligros. No se añaden vidas, menús ni pantallas de derrota.
@@ -19,7 +19,7 @@ Implementación de los capítulos 1 a 8 de LuisCanary, adaptada a Unity **6000.6
 - Modelo `Assets/Models/HelixPart.FBX` y prefab originales importados por el estudiante.
 - Prefab reutilizable `Assets/HelixJump/Prefabs/HelixLevel.prefab`, compuesto por sectores cada 30° y MeshColliders con su malla asignada.
 - Plataforma superior fija y tres plataformas intermedias generadas desde Stage, torre central, meta inferior dorada y bola con SphereCollider/Rigidbody.
-- Rebote mediante impulso de 3 N·s con masa de 1 kg, reinicio de velocidad y bloqueo de contactos duplicados durante 0.2 s.
+- Rebote mediante impulso de 4 N·s con masa de 1 kg, reinicio de velocidad y bloqueo de contactos duplicados durante 0.2 s.
 - Bola restringida a Y, sin rotación. Detección continua e interpolación.
 - Seguimiento de cámara en Y con separación inicial constante, manteniendo X/Z. Actualización en LateUpdate.
 - Material físico sin rebote adicional para no acumular impulsos; materiales gráficos compatibles con URP.
@@ -103,7 +103,9 @@ Se verificaron además el asset Stage de 12 secciones, referencias del Inspector
 
 No se generó APK ni se validó Android físico. Git/GitHub y la entrega están bajo control del usuario. El ZIP es respaldo de fuentes reproducible; el producto solicitado por UDG+ sigue siendo un enlace público al repositorio.
 
-## Actividad 4.4 — capítulos 7 y 8 (estado vigente)
+## Estado histórico al finalizar la actividad 4.4 — capítulos 7 y 8
+
+El estado vigente de capítulos 9/10 se documenta al final; ahora sí hay avance real entre Stages y menú.
 
 ### Generación y mejoras visuales
 - `HelixController.LoadStage(int)` valida referencias, stages y secciones; limita el índice al rango válido y restaura la rotación inicial de la torre.
@@ -137,5 +139,41 @@ Escena guardada fuera de Play; Run In Background vuelve al valor previo desactiv
 Apoyos consultados mediante transcripciones completas:
 7. Lógica Levels 2: https://youtu.be/fVWx40nGfmc
 8. Completar nivel: https://youtu.be/c0qAMPNQvYY
+
+## Actividad 4.5 — capítulos 9 y 10 (estado vigente)
+
+### Menú y navegación
+- Abrir `Scenes/MainMenu.unity`: título Helix Jump, botones Jugar/Salir, Canvas adaptable 1080x1920, EventSystem con InputSystemUIInputModule y callbacks persistentes.
+- MenuController.Play usa SceneManager.LoadScene para abrir HelixJump. MainMenu figura primero en escenas de compilación y HelixJump después; otras escenas ya existentes se conservan.
+- Salir usa Application.Quit en la compilación. En el editor solo registra el mensaje de comprobación y no cierra Unity. No se afirma salida verificada en un ejecutable, pues no se generó build.
+
+### Cambio real de Stage
+- GameManager.NextLevel avanza dentro de la misma escena, restablece la bola y carga el Stage siguiente **sin borrar Score**. La meta se bloquea brevemente para evitar varios avances por contactos del mismo paso físico.
+- RestartLevel pone Score a cero, conserva Best y recarga el Stage actual con otra distribución aleatoria. TrailRenderer se limpia al restituir la bola para evitar una línea de teletransporte.
+- Se conectaron tres assets propios `Stages/Stage_Christmas_910_01.asset`, `_02.asset` y `_03.asset`: tres anillos por Stage, paletas menta/hielo/cálida con verdes de bola, seguras claras y peligros rojos.
+- Al agotar la lista se limita el índice al último Stage y se recarga este. No se añade pantalla de victoria, regreso automático al menú, pausa, ajustes, vidas ni UI de récord en menú.
+
+### Ajustes visuales
+- Se retiró DeathPart de prueba de la plataforma superior fija.
+- Cámara con X original y pequeños giros Y=-0.5 y Z=8 grados.
+- Dos luces direccionales cálida/fría cercana al blanco, intensidades 0.5 y 1, ambas sin sombras.
+- Se conserva URP y su renderer Forward existente (Mobile_Renderer). No se copia la opción Deferred de la cámara Built-in del tutorial, ni se cambia el pipeline global. La cámara permite MSAA, pero el asset actual tiene una muestra; no se afirma antialiasing 4x activado.
+- Impulso final **4**: se toma 5.5 del vídeo como referencia, pero se ajusta al tamaño y separación actuales para conservar margen bajo las plataformas. Masa 1, esfera de radio mundial 0.15 y separación 1.525. No se ampliaron arbitrariamente la torre ni las anclas.
+- BallTrail: TrailRenderer con material URP Particles/Unlit transparente, duración 0.25, ancho decreciente 0.18 a cero, distancia mínima 0.2 y gradiente fijo menta/verde con transparencia final. El trazo es deliberadamente sutil; se comprobó emitiendo puntos en Play y su limpieza en ResetBall.
+- `Editor/Chapter910Setup.cs` ya aplicado. No ejecutar setups anteriores para continuar. El setup vuelve a crear el menú, por lo que no conviene ejecutarlo sobre ajustes manuales posteriores sin respaldo.
+
+### Pruebas actuales
+Suite HelixJump en Unity Pipeline: **20/20 aprobadas**, cero fallos, omitidas o inconclusas. Incluye las regresiones anteriores y nuevas comprobaciones de menú, callbacks, Input System, orden de escenas, luces y material de estela.
+
+Una UnityTest entra a Play desde MainMenu, ejecuta los botones, carga la escena por SceneManager y verifica dos contactos físicos sucesivos con la meta: Stage 0 → 1 → 2. Para aislar las transiciones, sitúa la bola encima de la meta y deja que la física produzca la colisión; no se presenta como recorrido manual completo de cada Stage. Comprueba Score conservado, cambios de color, ausencia de plataformas duplicadas, reinicio en Stage correcto y conservación de Best. Otra prueba verifica contactos duplicados. Las pruebas restauran únicamente la clave específica de PlayerPrefs usando SessionState a través de los reloads.
+
+Además, un ratón virtual temporal atravesó el InputSystemUIInputModule y el raycast del botón Jugar, comprobando el cambio real MainMenu → HelixJump; se retiró ese dispositivo al finalizar. No se afirma prueba táctil física. Capturas reales de menú y juego en 1080x1920 revisadas, sin solapamientos importantes.
+
+Al finalizar, escenas guardadas, MainMenu abierto fuera de Play, compilación sin fallos y override Run In Background restaurado a false. Sin APK, ejecutable ni validación Android físico. No hubo operaciones Git/GitHub ni envío a UDG+.
+
+Apoyos consultados mediante transcripciones completas:
+9. Mejora Visual y cambio nivel: https://youtu.be/9t5BCUVNLCo
+10. Main Menu - Trail: https://youtu.be/F0n-oubaVVU
+
 
 

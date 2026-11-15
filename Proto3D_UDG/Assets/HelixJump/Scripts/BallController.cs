@@ -51,6 +51,7 @@ namespace HelixJump
             body.angularVelocity = Vector3.zero;
             body.position = initialPosition;
             transform.position = initialPosition;
+            foreach (var trail in GetComponentsInChildren<TrailRenderer>(true)) trail.Clear();
             nextBounceTime = float.NegativeInfinity;
             BounceCount = 0;
         }

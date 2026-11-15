@@ -28,12 +28,12 @@ public class HelixJump43ConfigurationTests
         var controller=GameObject.Find("Helix").GetComponent(TypeCache.GetTypesDerivedFrom<MonoBehaviour>().Single(t=>t.FullName=="HelixJump.HelixController"));
         var references=new SerializedObject(controller);
         foreach(var n in new[]{"top","goal","levelPrefab"}) Assert.That(references.FindProperty(n).objectReferenceValue,Is.Not.Null,n);
-        Assert.That(references.FindProperty("stages").arraySize,Is.EqualTo(1));
+        Assert.That(references.FindProperty("stages").arraySize,Is.EqualTo(3));
         var all=UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
         var passages=all.Where(c=>c.GetType().FullName=="HelixJump.PassScorePoint").ToArray();
         Assert.That(passages.Length,Is.EqualTo(1),"Solo el ancla superior está preconstruida; las otras plataformas se generan en Play.");
         Assert.That(passages.All(c=>c.GetComponent<BoxCollider>().isTrigger),Is.True);
-        Assert.That(all.Count(c=>c.GetType().FullName=="HelixJump.DeathPart"),Is.EqualTo(1));
+        Assert.That(all.Count(c=>c.GetType().FullName=="HelixJump.DeathPart"),Is.EqualTo(0),"El capítulo 9 retira el peligro de prueba del ancla superior.");
         Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/HelixJump/Prefabs/HelixLevel_Chapter56.prefab"),Is.Not.Null);
     }
 }
