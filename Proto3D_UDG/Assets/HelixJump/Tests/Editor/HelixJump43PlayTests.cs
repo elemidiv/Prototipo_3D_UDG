@@ -32,7 +32,8 @@ public class HelixJump43PlayTests
         var box=gate.AddComponent<BoxCollider>(); box.isTrigger=true; box.size=new Vector3(4,0.1f,4);
         var point=gate.AddComponent(Find("PassScorePoint"));
         rb.linearVelocity=Vector3.down*4;
-        for(int i=0;i<60 && !(bool)Get(point,"Passed");i++) yield return new WaitForFixedUpdate();
+        float until=Time.fixedTime+3f, deadline=Time.realtimeSinceStartup+30f;
+        while(Time.fixedTime<until && Time.realtimeSinceStartup<deadline && !(bool)Get(point,"Passed")) yield return new WaitForFixedUpdate();
         Assert.That(Get(point,"Passed"),Is.True,"El paso debe provenir de OnTriggerEnter real. pos="+rb.position+" v="+rb.linearVelocity+" gravity="+rb.useGravity+" kinematic="+rb.isKinematic+" sim="+Physics.simulationMode+" collider="+go.GetComponent<Collider>()+" gm="+gm+" scene="+go.scene.name);
         Assert.That(Get(gm,"CurrentScore"),Is.EqualTo(1));
         Assert.That(Call(point,"TryPass",go.GetComponent<Collider>()),Is.False);
@@ -50,7 +51,8 @@ public class HelixJump43PlayTests
         Call(gm,"AddScore",7); int best=(int)Get(gm,"BestScore");
         UnityEngine.TestTools.LogAssert.Expect(LogType.Log,"Pasamos de nivel"); Call(gm,"NextLevel");
         rb.linearVelocity=Vector3.down*4;
-        for(int i=0;i<60 && (int)Get(gm,"CurrentScore")!=0;i++) yield return new WaitForFixedUpdate();
+        until=Time.fixedTime+3f; deadline=Time.realtimeSinceStartup+30f;
+        while(Time.fixedTime<until && Time.realtimeSinceStartup<deadline && (int)Get(gm,"CurrentScore")!=0) yield return new WaitForFixedUpdate();
         Assert.That(Get(gm,"CurrentScore"),Is.EqualTo(0),"La colisión DeathPart debe reiniciar.");
         Assert.That(Get(gm,"BestScore"),Is.EqualTo(best));
         Assert.That(Get(gm,"GoalReached"),Is.False);

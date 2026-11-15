@@ -25,8 +25,9 @@ public class HelixJump42Tests
         Assert.That(labels.Single(t => t.name == "BestScoreText").text, Is.EqualTo("Best: 0"));
         Assert.That(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/HelixJump/Prefabs/HelixGoal.prefab"), Is.Not.Null);
         var helix = roots.Single(r => r.name == "Helix");
-        var lower = helix.transform.Find("HelixLevel_02");
-        Assert.That(Enumerable.Range(0, lower.childCount).Any(i => !lower.GetChild(i).gameObject.activeSelf), Is.True, "La plataforma intermedia necesita un hueco para alcanzar la meta.");
+        Assert.That(helix.transform.Find("HelixLevel_02"),Is.Null,"El capítulo 7 sustituye la plataforma intermedia manual por generación.");
+        var top=helix.transform.Find("HelixLevel_01");
+        Assert.That(Enumerable.Range(0,top.childCount).Any(i=>!top.GetChild(i).gameObject.activeSelf),Is.True,"El ancla superior conserva su hueco inicial.");
     }
 
     [Test]

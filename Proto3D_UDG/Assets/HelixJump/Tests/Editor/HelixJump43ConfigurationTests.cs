@@ -31,9 +31,9 @@ public class HelixJump43ConfigurationTests
         Assert.That(references.FindProperty("stages").arraySize,Is.EqualTo(1));
         var all=UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
         var passages=all.Where(c=>c.GetType().FullName=="HelixJump.PassScorePoint").ToArray();
-        Assert.That(passages.Length,Is.EqualTo(2));
+        Assert.That(passages.Length,Is.EqualTo(1),"Solo el ancla superior está preconstruida; las otras plataformas se generan en Play.");
         Assert.That(passages.All(c=>c.GetComponent<BoxCollider>().isTrigger),Is.True);
-        Assert.That(all.Count(c=>c.GetType().FullName=="HelixJump.DeathPart"),Is.EqualTo(2));
+        Assert.That(all.Count(c=>c.GetType().FullName=="HelixJump.DeathPart"),Is.EqualTo(1));
         Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/HelixJump/Prefabs/HelixLevel_Chapter56.prefab"),Is.Not.Null);
     }
 }

@@ -1,6 +1,6 @@
-# Helix Jump — Actividades 4.1, 4.2 y 4.3
+# Helix Jump — Actividades 4.1 a 4.4
 
-Implementación de los capítulos 1 a 6 de LuisCanary, adaptada a Unity **6000.6.7f1**, URP e Input System.
+Implementación de los capítulos 1 a 8 de LuisCanary, adaptada a Unity **6000.6.7f1**, URP e Input System.
 
 ## Abrir y probar
 
@@ -8,7 +8,7 @@ Implementación de los capítulos 1 a 6 de LuisCanary, adaptada a Unity **6000.6
 2. En Game selecciona la resolución **Helix Jump Portrait (1080 × 1920)**, o cualquier proporción vertical 9:16.
 3. Pulsa Play. La bola verde cae y rebota; Score empieza en cero y Best carga el récord local.
 4. Mantén pulsado el botón izquierdo del ratón sobre Game y arrastra horizontalmente para girar la torre. En móvil, el controlador lee el toque principal mediante Input System; pendiente de validación en dispositivo físico.
-5. Alinea los huecos de las dos plataformas con la bola para descender hasta la meta dorada. No necesitas desactivar piezas manualmente.
+5. Alinea los huecos de la plataforma superior y las tres plataformas generadas con la bola para descender hasta la meta dorada. Los huecos y peligros de las plataformas generadas cambian al volver a iniciar Play.
 6. Al tocar la meta se escribe **Pasamos de nivel** en Console. No cambia de escena: ese desarrollo pertenece a capítulos posteriores.
 7. Detén Play y vuelve a iniciarlo: Score se reinicia y Best se conserva. El récord local puede incluir puntuaciones obtenidas durante las pruebas de desarrollo.
 
@@ -18,7 +18,7 @@ Implementación de los capítulos 1 a 6 de LuisCanary, adaptada a Unity **6000.6
 
 - Modelo `Assets/Models/HelixPart.FBX` y prefab originales importados por el estudiante.
 - Prefab reutilizable `Assets/HelixJump/Prefabs/HelixLevel.prefab`, compuesto por sectores cada 30° y MeshColliders con su malla asignada.
-- Dos plataformas con huecos, torre central, meta inferior dorada y bola con SphereCollider/Rigidbody.
+- Plataforma superior fija y tres plataformas intermedias generadas desde Stage, torre central, meta inferior dorada y bola con SphereCollider/Rigidbody.
 - Rebote mediante impulso de 3 N·s con masa de 1 kg, reinicio de velocidad y bloqueo de contactos duplicados durante 0.2 s.
 - Bola restringida a Y, sin rotación. Detección continua e interpolación.
 - Seguimiento de cámara en Y con separación inicial constante, manteniendo X/Z. Actualización en LateUpdate.
@@ -67,7 +67,9 @@ No se generó APK ni se probó en un dispositivo Android físico. No se afirma v
 5. Score y DeathPart/5-Cap: https://youtu.be/0asOPNehwHY
 6. Lógica Levels/6-Cap: https://youtu.be/tx5PDevroCE
 
-## Actividad 4.3 — capítulos 5 y 6
+## Estado histórico al finalizar la actividad 4.3 — capítulos 5 y 6
+
+La actividad 4.4 descrita al final sustituye el LoadStage vacío por generación y aplicación de colores. No ejecutar Chapter56Setup sobre la escena actual para continuar jugando.
 
 Se consultaron las transcripciones completas de ambos apoyos. Alcance limitado a los tutoriales por decisión expresa del estudiante: no adelantar mecánicas de capítulos posteriores.
 
@@ -100,4 +102,40 @@ Suite Unity Pipeline, filtro HelixJump, modo EditMode: **12/12 aprobadas**. Incl
 Se verificaron además el asset Stage de 12 secciones, referencias del Inspector, dos triggers y dos peligros activos, prefab propio y regresiones de controles, cámara, UI y persistencia. Las pruebas deben restaurar solamente la clave concreta de PlayerPrefs, sin DeleteAll. Captura real de Game View en 1080 × 1920 revisada visualmente. Escena guardada, Play detenido y override Run In Background desactivado al terminar.
 
 No se generó APK ni se validó Android físico. Git/GitHub y la entrega están bajo control del usuario. El ZIP es respaldo de fuentes reproducible; el producto solicitado por UDG+ sigue siendo un enlace público al repositorio.
+
+## Actividad 4.4 — capítulos 7 y 8 (estado vigente)
+
+### Generación y mejoras visuales
+- `HelixController.LoadStage(int)` valida referencias, stages y secciones; limita el índice al rango válido y restaura la rotación inicial de la torre.
+- Destruye las plataformas de la carga anterior, limpia la lista e instancia las nuevas entre la plataforma superior y la meta. Las anclas permanentes nunca se destruyen. En Play, las instancias salientes se desactivan y separan antes de su destrucción diferida.
+- La cámara utiliza Solid Color y `Stage.backgroundColor`; la bola recibe `ballColor`. Las piezas seguras reciben `helixColor` y DeathPart conserva rojo. Se usa MaterialPropertyBlock compatible con URP para no alterar materiales originales compartidos.
+- Solo los sectores con MeshCollider participan en la selección: el objeto hijo del trigger de puntuación nunca se desactiva como si fuera una pieza.
+- Los huecos y peligros se seleccionan aleatoriamente sin repetición. Cantidades fuera de rango se limitan para evitar bucles imposibles; siempre queda al menos un sector abierto.
+- La generación ocurre al iniciar Play o llamar LoadStage. Perder conserva el diseño del intento y reinicia bola/Score/triggers; no regenera automáticamente todo el Stage ni cambia de nivel.
+
+### Configuración de ejemplo jugable
+`Assets/HelixJump/Stages/Stage_Christmas_78.asset` es el Stage conectado a la escena. Contiene tres anillos intermedios: **8 sólidos/1 peligro**, **9/2** y **10/2**. Se usan tres secciones para respetar el espacio de la torre existente; el antiguo Stage_Example con 12 secciones se conserva como recurso didáctico y no está conectado.
+
+Cada anillo tiene 12 sectores antes de abrir huecos. Las alturas locales verificadas son 1.475, -0.05 y -1.575; distancia entre anclas con margen: 6.1. La plataforma superior fija conserva su hueco y peligro. Conservamos bola verde, seguras marfil, peligros rojos, fondo menta, torre verde pino, meta dorada y HUD legible.
+
+Edita los colores y la lista levels del Stage conectado desde el Inspector **fuera de Play** y vuelve a iniciar para ver los cambios. No se añaden luces extra, posprocesado, menús, dificultad automática ni transición real al siguiente Stage. La meta mantiene el aviso Pasamos de nivel del tutorial.
+
+### Archivos añadidos y preparación
+- `Prefabs/HelixLevel_Chapter78.prefab`: 12 sectores disponibles, sin peligros prefijados y con trigger intacto.
+- `Editor/Chapter78Setup.cs`: migración ya aplicada; elimina la plataforma intermedia manual y conecta el Stage/prefab nuevos. No es necesario ejecutarlo para jugar; reabriría y reconfiguraría la escena guardada.
+- Pruebas nuevas: `HelixJump44Tests.cs` y `HelixJump44SafetyTests.cs`. Las pruebas anteriores se adaptan a que solo el ancla superior está preconstruida.
+
+### Verificación actual
+Suite Unity Pipeline filtro HelixJump: **17/17 aprobadas**, cero fallos, omitidas o inconclusas. Incluye generación, posiciones, cantidades, trigger conservado, restauración de rotación, recarga sin duplicados, colores y datos vacíos/nulos/fuera de rango, más las regresiones de capítulos anteriores.
+
+La prueba física de puntuación y muerte entra realmente en Play Mode con objetos aislados. Su espera se basa en tiempo físico, no en una cantidad arbitraria de frames del runner. Preserva la clave de PlayerPrefs mediante SessionState entre recargas de dominio.
+
+Comprobación adicional en Play de los tres anillos generados: 12 sectores cada uno; activos 8/9/10 y peligros 1/2/2; colores de cámara, bola, seguros y peligros verificados. Se llamó LoadStage con índice alto y se comprobó que no duplica plataformas y restaura rotación. Se observó avance real de Time.time; captura de Game View 1080x1920 revisada visualmente.
+
+Escena guardada fuera de Play; Run In Background vuelve al valor previo desactivado. No se genera APK ni se afirma validación Android físico. Git/GitHub y el envío existente en UDG+ no se modifican.
+
+Apoyos consultados mediante transcripciones completas:
+7. Lógica Levels 2: https://youtu.be/fVWx40nGfmc
+8. Completar nivel: https://youtu.be/c0qAMPNQvYY
+
 
