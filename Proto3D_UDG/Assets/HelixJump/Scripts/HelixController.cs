@@ -15,6 +15,8 @@ namespace HelixJump
         [SerializeField] List<Stage> stages = new List<Stage>();
         [SerializeField] List<GameObject> spawnedLevels = new List<GameObject>();
         public float StageDistance { get; private set; }
+        public Transform Top => top;
+        public Transform Goal => goal;
         public int StageCount => stages == null ? 0 : stages.Count;
 
         Quaternion initialRotation;
@@ -60,6 +62,7 @@ namespace HelixJump
             for (int i = 0; i < stage.levels.Count; i++)
             {
                 var level = Instantiate(levelPrefab, transform);
+                if (level.GetComponent<BreakablePlatform>() == null) level.AddComponent<BreakablePlatform>();
                 level.name = "GeneratedLevel_" + (i + 1).ToString("00");
                 level.transform.localPosition = new Vector3(0, top.localPosition.y - spacing * (i + 1), 0);
                 level.transform.localRotation = Quaternion.identity;

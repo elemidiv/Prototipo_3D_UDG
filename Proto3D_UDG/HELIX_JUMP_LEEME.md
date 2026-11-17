@@ -1,6 +1,6 @@
-# Helix Jump — Actividades 4.1 a 4.5
+# Helix Jump — Actividades 4.1 a 4.6
 
-Implementación de los capítulos 1 a 10 de LuisCanary, adaptada a Unity **6000.6.7f1**, URP e Input System.
+Implementación de los capítulos 1 a 12 de LuisCanary, adaptada a Unity **6000.6.7f1**, URP e Input System.
 
 ## Abrir y probar
 
@@ -140,7 +140,9 @@ Apoyos consultados mediante transcripciones completas:
 7. Lógica Levels 2: https://youtu.be/fVWx40nGfmc
 8. Completar nivel: https://youtu.be/c0qAMPNQvYY
 
-## Actividad 4.5 — capítulos 9 y 10 (estado vigente)
+## Estado histórico al finalizar la actividad 4.5 — capítulos 9 y 10
+
+El estado vigente de SuperSpeed, progreso y partículas se documenta al final.
 
 ### Menú y navegación
 - Abrir `Scenes/MainMenu.unity`: título Helix Jump, botones Jugar/Salir, Canvas adaptable 1080x1920, EventSystem con InputSystemUIInputModule y callbacks persistentes.
@@ -174,6 +176,49 @@ Al finalizar, escenas guardadas, MainMenu abierto fuera de Play, compilación si
 Apoyos consultados mediante transcripciones completas:
 9. Mejora Visual y cambio nivel: https://youtu.be/9t5BCUVNLCo
 10. Main Menu - Trail: https://youtu.be/F0n-oubaVVU
+
+## Actividad 4.6 — capítulos 11 y 12 más partículas autorizadas (estado vigente)
+
+### SuperSpeed por racha
+- Atravesar tres plataformas sin colisionar activa SuperSpeed una sola vez por racha. PassScorePoint sigue puntuando una vez por intento y notifica el paso a la bola.
+- Se añade un impulso descendente de 8 N·s a la velocidad existente. No se pone la velocidad a cero antes del impulso: una caída que ya es rápida debe acelerarse, no frenarse.
+- La siguiente colisión con un anillo generado rompe ese anillo completo, también si se toca un sector peligroso. Se produce un rebote y se desactiva la racha/SuperSpeed. La destrucción visual se difiere 0.2 s; los colliders se deshabilitan al aceptar la rotura para evitar contactos duplicados.
+- BreakablePlatform solo se añade a anillos generados. Meta, torre y anclas permanentes quedan protegidas; contactos ya encolados de un anillo que está rompiéndose se ignoran.
+- Un contacto normal reinicia la racha. El cooldown solo elimina rebotes repetidos; no concede inmunidad ante piezas rojas fuera de SuperSpeed.
+- Reiniciar o avanzar limpia combo, estado especial, partículas y estela. Recargar el Stage vuelve a generar los anillos destruidos.
+
+### Partículas navideñas distintas
+Adición expresamente autorizada por el estudiante:
+- **Rebote aceptado:** 14 copos marfil/dorados con textura propia de seis brazos, ráfaga corta alrededor del contacto. La textura Snowflake_1112 se genera procedimentalmente en el editor; no requiere descargas ni reemplaza recursos importados.
+- **Activación de SuperSpeed:** 32 piezas de confeti rojo/verde/dorado, estiradas y con más dispersión; se refuerzan color, ancho y tiempo de la estela mientras el estado está activo, restaurándolos después.
+- Sistemas sin bucle ni emisión continua, simulación en espacio World, materiales URP propios y máximo 128 partículas por sistema. Los contadores de eventos y el cooldown evitan spam por contactos duplicados.
+- ClearAll limpia ambos sistemas en reinicio/desactivación; no quedan partículas arrastradas durante teletransporte.
+
+### Barra de progreso y niveles
+- Slider no interactuable, sin handle, en el HUD superior; se reorganizaron título, Score y Best sin solapamientos importantes.
+- Progreso = Clamp01((topY - ballY) / (topY - goalY)), con protección de distancia cero. Se suaviza por interpolación dependiente de deltaTime.
+- Indicadores: nivel actual CurrentLevel+1 y siguiente CurrentLevel+2, tal como el tutorial. El indicador 4 al terminar el tercer Stage no crea automáticamente un Stage adicional; la lista mantiene el comportamiento protegido del capítulo anterior.
+- La barra vuelve a cero al reiniciar o avanzar y puede subir/bajar con la altura de la bola al rebotar.
+
+### Archivos y uso
+- BallController, PassScorePoint, HelixController y UIManager integran la mecánica.
+- Nuevos BreakablePlatform y ChristmasBallEffects; setup `Editor/Chapter1112Setup.cs`, ya aplicado. No ejecutar setups antiguos para continuar.
+- Materiales ChristmasParticles_1112 y ChristmasSnow_1112; textura `Textures/Snowflake_1112.png`.
+- Para comprobar: inicia MainMenu → Jugar; observa nieve al rebotar, atraviesa tres plataformas seguidas para activar el impulso/confeti/estela y toca un anillo para romperlo. La meta debe seguir avanzando de Stage. El Inspector de BallController permite ajustar umbral e impulso, pero el valor final aprobado es umbral 3.
+
+### Pruebas y límites
+Suite final Unity Pipeline, filtro HelixJump: **31/31 aprobadas**, 0 fallos, omitidas o inconclusas. Incluye regresiones anteriores, tres pasos/activación única/reset, impulso sumado a caída existente, peligro durante cooldown, progreso normalizado y límites, Slider/textos, partículas distintas/antispam/limpieza, y física Play con anillos seguros y peligrosos: rebote, destrucción completa tras demora y meta protegida.
+
+Se verificó compilación sin fallos y presencia real de sistemas emitiendo partículas. Se obtuvieron vistas reales de Game View 1080x1920: las capturas de los dos efectos son **previsualizaciones controladas** de sus métodos de producción, con simulación de partículas avanzada y pausa para poder inspeccionarlas; no se presentan como una partida manual completa. La activación y colisiones físicas se comprobaron por pruebas separadas. Se retiraron los archivos temporales de Assets.
+
+**Alcance temporal:** no se añadió temporizador de tres segundos. Como en el capítulo 11, SuperSpeed termina por colisión o reinicio; no se declara cumplido un límite temporal máximo que el tutorial no implementa. El usuario aprobó ese alcance y añadió las partículas. Las vidas cortas de las partículas no equivalen a limitar la duración de SuperSpeed.
+
+MainMenu y BuildSettings se preservan sin cambios respecto de 4.5. Sin Git/GitHub, envíos, APK, ejecutable ni validación Android físico.
+
+Apoyos consultados mediante transcripciones completas:
+11. SuperSpeed: https://youtu.be/IcgtgnvanWs
+12. Barra de progreso-Slider: https://youtu.be/okhTiHn5-rc
+
 
 
 

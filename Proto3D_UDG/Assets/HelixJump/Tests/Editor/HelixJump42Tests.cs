@@ -19,7 +19,7 @@ public class HelixJump42Tests
         Assert.That(components.Count(c => c.GetType().FullName == "HelixJump.UIManager"), Is.EqualTo(1));
         Assert.That(components.Count(c => c.GetType().FullName == "HelixJump.GoalController"), Is.EqualTo(12));
         var labels = roots.SelectMany(r => r.GetComponentsInChildren<UnityEngine.UI.Text>()).ToArray();
-        Assert.That(labels.Length, Is.EqualTo(3));
+        Assert.That(labels.Length, Is.EqualTo(5), "Título, Score, Best y dos indicadores de nivel de la actividad 4.6.");
         Assert.That(labels.Single(t => t.name == "GameTitle").text, Is.EqualTo("Helix Jump"));
         Assert.That(labels.Single(t => t.name == "CurrentScoreText").text, Is.EqualTo("Score: 0"));
         Assert.That(labels.Single(t => t.name == "BestScoreText").text, Is.EqualTo("Best: 0"));
