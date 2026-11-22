@@ -1,0 +1,1 @@
+D:\Sistema\Documentos\Proyectos\UDG\Prototipo_3D\Proto3D_UDG\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\q5t3u2uq\obj\arm64-v8a

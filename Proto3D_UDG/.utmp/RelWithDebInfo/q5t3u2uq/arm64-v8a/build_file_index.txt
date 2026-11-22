@@ -1,0 +1,2 @@
+D:\Sistema\Documentos\Proyectos\UDG\Prototipo_3D\Proto3D_UDG\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+D:\Sistema\Documentos\Proyectos\UDG\Prototipo_3D\Proto3D_UDG\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt

@@ -47,7 +47,10 @@ public class HelixJump45FlowTests
         for(int expected=1;expected<=2;expected++)
         {
             var goal=GameObject.Find("Helix").transform.Find("HelixGoal");
-            body.position=new Vector3(0,goal.position.y+0.6f,-1.5f);body.linearVelocity=Vector3.down*3;
+            Physics.SyncTransforms();
+            float surfaceY=goal.GetComponentsInChildren<MeshCollider>().Max(c=>c.bounds.max.y);
+            // Start above the real surface; anchor thickness is no longer the old one.
+            body.position=new Vector3(0,surfaceY+0.6f,-1.5f);body.linearVelocity=Vector3.down*3;
             LogAssert.Expect(LogType.Log,"Pasamos de nivel");
             float deadline=Time.realtimeSinceStartup+30;
             while(Value(manager,"CurrentLevel")<expected && Time.realtimeSinceStartup<deadline)yield return new WaitForFixedUpdate();
@@ -56,7 +59,7 @@ public class HelixJump45FlowTests
             Assert.That(body.position.y,Is.GreaterThan(3.5f));
             Assert.That(Camera.main.backgroundColor,Is.Not.EqualTo(previous));previous=Camera.main.backgroundColor;
             var helix=GameObject.Find("Helix").transform;
-            Assert.That(Enumerable.Range(0,helix.childCount).Count(i=>helix.GetChild(i).name.StartsWith("GeneratedLevel_")),Is.EqualTo(3));
+            Assert.That(Enumerable.Range(0,helix.childCount).Count(i=>helix.GetChild(i).name.StartsWith("GeneratedLevel_")),Is.EqualTo(9));
             yield return new WaitForSeconds(0.15f);
         }
         int best=Value(manager,"BestScore");Call(manager,"RestartLevel");

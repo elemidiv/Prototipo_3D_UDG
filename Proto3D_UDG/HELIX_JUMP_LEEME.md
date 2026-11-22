@@ -8,7 +8,7 @@ Implementación de los capítulos 1 a 12 de LuisCanary, adaptada a Unity **6000.
 2. En Game selecciona la resolución **Helix Jump Portrait (1080 × 1920)**, o cualquier proporción vertical 9:16.
 3. Pulsa Play y después **Jugar** en el menú. La bola verde cae y rebota; Score empieza en cero y Best carga el récord local.
 4. Mantén pulsado el botón izquierdo del ratón sobre Game y arrastra horizontalmente para girar la torre. En móvil, el controlador lee el toque principal mediante Input System; pendiente de validación en dispositivo físico.
-5. Alinea los huecos de la plataforma superior y las tres plataformas generadas con la bola para descender hasta la meta dorada. Los huecos y peligros de las plataformas generadas cambian al volver a iniciar Play.
+5. Alinea los huecos de la plataforma superior y las nueve plataformas generadas con la bola para descender hasta la meta dorada. Los huecos y peligros de las plataformas generadas cambian al volver a iniciar Play.
 6. Al tocar la meta avanzas al siguiente Stage, conservando Score y regresando la bola al inicio. Al agotar los tres Stages se recarga el último sin índices fuera de rango. Los Stages comparten la misma escena; SceneManager se utiliza del menú al juego.
 7. Detén Play y vuelve a iniciarlo: Score se reinicia y Best se conserva. El récord local puede incluir puntuaciones obtenidas durante las pruebas de desarrollo.
 
@@ -18,7 +18,7 @@ Implementación de los capítulos 1 a 12 de LuisCanary, adaptada a Unity **6000.
 
 - Modelo `Assets/Models/HelixPart.FBX` y prefab originales importados por el estudiante.
 - Prefab reutilizable `Assets/HelixJump/Prefabs/HelixLevel.prefab`, compuesto por sectores cada 30° y MeshColliders con su malla asignada.
-- Plataforma superior fija y tres plataformas intermedias generadas desde Stage, torre central, meta inferior dorada y bola con SphereCollider/Rigidbody.
+- Plataforma superior fija y nueve plataformas intermedias generadas desde Stage, torre central, meta inferior dorada y bola con SphereCollider/Rigidbody.
 - Rebote mediante impulso de 4 N·s con masa de 1 kg, reinicio de velocidad y bloqueo de contactos duplicados durante 0.2 s.
 - Bola restringida a Y, sin rotación. Detección continua e interpolación.
 - Seguimiento de cámara en Y con separación inicial constante, manteniendo X/Z. Actualización en LateUpdate.
@@ -218,6 +218,45 @@ MainMenu y BuildSettings se preservan sin cambios respecto de 4.5. Sin Git/GitHu
 Apoyos consultados mediante transcripciones completas:
 11. SuperSpeed: https://youtu.be/IcgtgnvanWs
 12. Barra de progreso-Slider: https://youtu.be/okhTiHn5-rc
+
+## Revisión geométrica previa al APK — estado actual
+
+Cambios solicitados y aprobados por el estudiante después de la revisión del producto integrador. No equivalen a compilar o publicar la aplicación.
+
+| Parámetro | Antes | Ahora |
+|---|---|---|
+| Anillos generados por cada Stage | 3 | 9 |
+| Separación entre anillos | 1.525 unidades | 3 unidades |
+| Grosor físico medido | 0.1793553 | Aproximadamente 0.3587104, el doble |
+| Racha de SuperSpeed | 3 pasos | 3 pasos |
+| Impulso adicional descendente | 8 | 8, revalidado con el prefab engrosado real |
+| Rebote normal | 4 | 4 |
+
+La plataforma superior fija es adicional a los nueve anillos generados. Los tres Stages conectados ahora contienen nueve secciones; cada entrada anterior se repite tres veces, preservando su progresión de sólidos y peligros. Las posiciones locales generadas verificadas son 0,-3,-6,-9,-12,-15,-18,-21,-24; la meta se desplazó a Y=-26.9 y la torre se amplió hasta cubrir el recorrido. No se cambiaron las posiciones iniciales de bola/cámara ni los controles.
+
+El prefab propio `Prefabs/HelixLevel_GeometryRevision.prefab` conserva el radio y el trigger plano. Los sectores importados tienen rotación X de 270 grados: escalar directamente su Y local alteraría el radio. Por eso se añadieron pivotes propios en espacio del anillo, con escala vertical 2, que duplican únicamente el grosor físico. El modelo y prefab anteriores se preservan.
+
+`Editor/GeometryRevisionSetup.cs` ya está aplicado. No es necesario ejecutarlo para jugar. No volver a aplicar setups antiguos: podrían restaurar configuración anterior o referencias de prefab. SuperSpeed sigue usando CCD ContinuousDynamic, impulso aditivo8 y umbral3; las pruebas con el anillo real grueso verifican caída, impacto seguro/peligroso, rebote, destrucción completa con demora0.2 y meta protegida. No fue necesario elevar el impulso para la nueva separación.
+
+Suite final filtro HelixJump: **35/35 aprobadas**, cero fallos, omitidas o inconclusas. Incluye nueve anillos en cada uno de los tres Stages, separación exacta, doble grosor de todos los sectores, radio intacto, trigger inalterado, holgura de rebote, torre/anclas, física de SuperSpeed y las regresiones de UI, progreso, Score/Best, menú y cambio de Stage. Los fixtures aislados que generan tres plataformas deliberadamente no se modificaron para simular una aprobación.
+
+Lectura adicional en Play confirmó nueve anillos, grosor0.358710378, separación3, combo3/impulso8, rebote4 y CCD. Captura real 1080x1920 revisada. MainMenu y BuildSettings no se alteraron. Escenas guardadas, Play detenido y Run In Background restaurado al valor previo.
+
+**Corrección de inicio/meta:** la revisión anterior no había aplicado el grosor a las dos anclas. Ahora ambos pisos igualan el prefab intermedio: inicio0.358710766 y meta0.358711243 unidades medidas, con tolerancia0.001. El setup ya corrige ambos y es idempotente. En anclas de prefab conectado se ajusta Z local (eje vertical de la malla rotada270°), registrando overrides sin reparentar sectores ni alterar el radio. Nueva prueba StartAndGoal_HaveSamePhysicalThicknessAsIntermediatePrefab: RED antes y GREEN después. El fixture de dos metas físicas ahora posiciona la bola respecto a la superficie real del collider, no al antiguo origen de grosor fijo. Suite completa35/35.
+
+## Preparación Android y menú navideño
+
+- MainMenu conserva el diseño existente y añade «versión navideña» debajo del título. Verificación visual real Game View1080x1920 y1080x1440 sin solapamientos.
+- Company Name: `elemi`; Product Name: `Helix Jump`; identificador Android: `com.elemi.helixjump`. Versión existente0.1.0, código1, conservados.
+- Icono original en `Assets/HelixJump/Art/ChristmasLauncher/helix-christmas-icon.png`, RGB1024x1024, SVG editable junto al PNG. Se asignó icono predeterminado e iconos Adaptive Android en sus seis resoluciones, con Background/Foreground independientes y margen de seguridad. Arte navideño: bola verde con gorro, torre marfil/roja y base dorada. No son recursos externos.
+- Android activo, ARM64/IL2CPP, Portrait, mínimoAPI26, target automático, salida APK (no AAB), Development Build desactivado. Menú y juego habilitados en ese orden.
+- OpenJDK, SDK, NDK instalados y rutas verificadas. Java, adb y source.properties del NDK presentes; plataformas SDK34,36,37.0 y Build Tools36.0.0. No se instalaron SDK nuevos ni se cambiaron rutas/firma. Su compatibilidad final se comprobará al compilar.
+- Readback persistido en `C:/Users/Angel/AppData/Local/hermes/profiles/udg-bot/outputs/helix-android/readback-final.json`; capturas del menú en la misma carpeta. Temporales retirados de Assets.
+- Suite regresión35/35 después de los cambios, compilación C# sin fallos, Play detenido y runInBackground=false. Gameplay y geometría no se modificaron.
+
+**Build APK realizada y verificada:** `D:/Sistema/Escritorio/Build/HelixJump/HelixJump-Navidad-0.1.0.apk`,0.1.0/código1, com.elemi.helixjump,30,463,657bytes. Unity Succeeded, cero errores,30 avisos no bloqueantes. ZIP íntegro y firma APK v2 verificada (Android Debug para pruebas directas). Android mínimoAPI26/ARM64, target realAPI36. Icono y menú navideños incluidos; sin Development Build ni Pipeline Runtime. Reportes, checksum e instrucciones junto al APK. No se sobrescribieron builds existentes. Pendiente instalar/probar en Android real. Git/GitHub/foro/entrega siguen bajo control del usuario.
+
+
 
 
 

@@ -1,0 +1,5 @@
+D:/Sistema/Documentos/Proyectos/UDG/Prototipo_3D/Proto3D_UDG/.utmp/RelWithDebInfo/q5t3u2uq/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/Sistema/Documentos/Proyectos/UDG/Prototipo_3D/Proto3D_UDG/.utmp/RelWithDebInfo/q5t3u2uq/arm64-v8a/CMakeFiles/rebuild_cache.dir
+D:/Sistema/Documentos/Proyectos/UDG/Prototipo_3D/Proto3D_UDG/.utmp/RelWithDebInfo/q5t3u2uq/arm64-v8a/GameActivity/CMakeFiles/game.dir
+D:/Sistema/Documentos/Proyectos/UDG/Prototipo_3D/Proto3D_UDG/.utmp/RelWithDebInfo/q5t3u2uq/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+D:/Sistema/Documentos/Proyectos/UDG/Prototipo_3D/Proto3D_UDG/.utmp/RelWithDebInfo/q5t3u2uq/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir

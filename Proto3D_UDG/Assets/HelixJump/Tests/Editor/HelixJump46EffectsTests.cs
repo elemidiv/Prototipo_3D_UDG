@@ -42,11 +42,12 @@ public class HelixJump46EffectsTests
   var ballType=T("BallController");
   for(int danger=0;danger<2;danger++)
   {
-   var ring=new GameObject("IsolatedWholeRing46");ring.transform.position=new Vector3(1000,1000,1000);ring.AddComponent(T("BreakablePlatform"));
-   var sector=GameObject.CreatePrimitive(PrimitiveType.Cube);sector.transform.SetParent(ring.transform,false);sector.transform.localScale=new Vector3(4,0.2f,4);if(danger==1)sector.AddComponent(T("DeathPart"));
-   var spare=GameObject.CreatePrimitive(PrimitiveType.Cube);spare.transform.SetParent(ring.transform,false);spare.transform.localPosition=new Vector3(4,0,0);
-   var go=new GameObject("IsolatedSuper46");go.transform.position=new Vector3(1000,1001.2f,1000);var ball=go.AddComponent(ballType);go.GetComponent<SphereCollider>().radius=0.15f;
-   Boost(ball);var rb=go.GetComponent<Rigidbody>();float start=Time.fixedTime;float deadline=Time.realtimeSinceStartup+8;
+   var prefab=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/HelixJump/Prefabs/HelixLevel_GeometryRevision.prefab");
+   var ring=UnityEngine.Object.Instantiate(prefab);ring.name="RealThickRing46";ring.transform.position=new Vector3(1000,1000,1000);ring.AddComponent(T("BreakablePlatform"));
+   var sectors=ring.GetComponentsInChildren<MeshCollider>(true);foreach(var c in sectors){c.gameObject.SetActive(true);if(danger==1)c.gameObject.AddComponent(T("DeathPart"));}
+   Physics.SyncTransforms();var sector=sectors[0];var spare=sectors[1].gameObject;
+   var go=new GameObject("IsolatedSuper46");go.transform.position=new Vector3(sector.bounds.center.x,sector.bounds.max.y+1.2f,sector.bounds.center.z);var ball=go.AddComponent(ballType);go.GetComponent<SphereCollider>().radius=0.15f;
+   Boost(ball);var rb=go.GetComponent<Rigidbody>();float start=Time.fixedTime;float deadline=Time.realtimeSinceStartup+30;
    while(Time.fixedTime<start+0.02f&&Time.realtimeSinceStartup<deadline)yield return null;
    Assert.That(rb.linearVelocity.y,Is.LessThan(-7),"8 impulse must move downward with CCD");
    while(ring!=null&&!(bool)Read(ring.GetComponent(T("BreakablePlatform")),"Breaking")&&Time.realtimeSinceStartup<deadline)yield return null;
